@@ -169,6 +169,7 @@ add_executable(lichii
     game/game_grid.cpp game/game_grid.h
 
     game/game_tree.h game/game_tree.cpp
+    game/card_view.h game/card_view.cpp
     game/game_card.h game/game_card.cpp
     game/search_field.h game/search_field.cpp
 

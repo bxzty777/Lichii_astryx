@@ -7,6 +7,8 @@
 #include <QKeyEvent>
 #include <QToolButton>
 
+#include "qt_common/config/uisettings.h"
+
 // TODO: Remove GameList dependence?
 GameListSearchField::KeyReleaseEater::KeyReleaseEater(GameList* gamelist_, QObject* parent)
     : QObject(parent), gamelist{gamelist_} {}
@@ -82,24 +84,28 @@ void GameListSearchField::setFocus() {
 }
 
 GameListSearchField::GameListSearchField(GameList* parent) : QWidget{parent} {
+    // Object names let a theme style the filter bar from its style.qss.
+    setObjectName(QStringLiteral("GameListSearchField"));
+    setAttribute(Qt::WA_StyledBackground);
+
     auto* const key_release_eater = new KeyReleaseEater(parent, this);
     layout_filter = new QHBoxLayout;
     layout_filter->setContentsMargins(8, 8, 8, 8);
     label_filter = new QLabel;
+    label_filter->setObjectName(QStringLiteral("GameListSearchLabel"));
     edit_filter = new QLineEdit;
+    edit_filter->setObjectName(QStringLiteral("GameListSearchEdit"));
     edit_filter->clear();
     edit_filter->installEventFilter(key_release_eater);
     edit_filter->setClearButtonEnabled(true);
     connect(edit_filter, &QLineEdit::textChanged, parent, &GameList::OnTextChanged);
     label_filter_result = new QLabel;
+    label_filter_result->setObjectName(QStringLiteral("GameListSearchResult"));
     button_filter_close = new QToolButton(this);
+    button_filter_close->setObjectName(QStringLiteral("GameListSearchClose"));
     button_filter_close->setText(QStringLiteral("X"));
     button_filter_close->setCursor(Qt::ArrowCursor);
-    button_filter_close->setStyleSheet(
-        QStringLiteral("QToolButton{ border: none; padding: 0px; color: "
-                       "#000000; font-weight: bold; background: #F0F0F0; }"
-                       "QToolButton:hover{ border: none; padding: 0px; color: "
-                       "#EEEEEE; font-weight: bold; background: #E81123}"));
+    UpdateCloseButtonStyle();
     connect(button_filter_close, &QToolButton::clicked, parent, &GameList::OnFilterCloseClicked);
     layout_filter->setSpacing(10);
     layout_filter->addWidget(label_filter);
@@ -110,9 +116,28 @@ GameListSearchField::GameListSearchField(GameList* parent) : QWidget{parent} {
     RetranslateUI();
 }
 
+void GameListSearchField::UpdateCloseButtonStyle() {
+    // The Astryx themes style the close button in their style.qss. A widget's own style sheet
+    // would override that, so only the other themes keep the classic red close button.
+    const bool themed = QString::fromStdString(UISettings::values.theme)
+                            .startsWith(QStringLiteral("astryx"));
+    const QString style =
+        themed ? QString{}
+               : QStringLiteral("QToolButton{ border: none; padding: 0px; color: "
+                                "#000000; font-weight: bold; background: #F0F0F0; }"
+                                "QToolButton:hover{ border: none; padding: 0px; color: "
+                                "#EEEEEE; font-weight: bold; background: #E81123}");
+    if (button_filter_close->styleSheet() != style) {
+        button_filter_close->setStyleSheet(style);
+    }
+}
+
 void GameListSearchField::changeEvent(QEvent* event) {
     if (event->type() == QEvent::LanguageChange) {
         RetranslateUI();
+    } else if (event->type() == QEvent::StyleChange) {
+        // Sent when the theme's style sheet is swapped.
+        UpdateCloseButtonStyle();
     }
 
     QWidget::changeEvent(event);

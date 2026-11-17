@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <QListView>
+#include "lichii/game/card_view.h"
 #include <QString>
 
 class GameCard;
 class GameListModel;
 class QResizeEvent;
 
-class GameCarousel : public QListView {
+class GameCarousel : public GameCardView {
     Q_OBJECT
 
 public:
