@@ -28,12 +28,16 @@ QFont GetMonospaceFont() {
 
 QIcon MenuIcon(const char* name) {
     QIcon icon;
-    if (UISettings::values.theme != "lichii") {
+    if (!UISettings::IsLichiiStyleTheme()) {
         return icon;
     }
-    icon.addFile(QStringLiteral(":/lichii/icons/menu_%1.png").arg(QLatin1String(name)));
-    icon.addFile(QStringLiteral(":/lichii/icons/menu_%1_white.png").arg(QLatin1String(name)), {},
-                 QIcon::Active);
+    icon.addFile(UISettings::ThemeIconPath(QStringLiteral("menu_%1.png").arg(QLatin1String(name))));
+    // Lichii Dark highlights a menu row with the accent, so its icon turns white there. The
+    // Astryx themes highlight with a light overlay and keep the normal icon.
+    if (UISettings::values.theme == "lichii") {
+        icon.addFile(QStringLiteral(":/lichii/icons/menu_%1_white.png").arg(QLatin1String(name)),
+                     {}, QIcon::Active);
+    }
     return icon;
 }
 

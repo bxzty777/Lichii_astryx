@@ -41,6 +41,23 @@ namespace UISettings {
 
 bool IsDarkTheme();
 
+// Lichii Dark and the Astryx themes share one layout: the custom game list painting, page and
+// menu icons, and an application palette. They differ only in colors.
+bool IsLichiiStyleTheme();
+
+// The colors that code paints with directly in the Lichii-style themes.
+struct StyleColors {
+    u32 window, surface, raised, hover, border, border_subtle;
+    u32 text, strong, secondary, placeholder, disabled;
+    u32 accent, accent_hover, accent_pressed, selection, on_accent;
+    u32 tooltip, tooltip_text;
+};
+const StyleColors& CurrentStyleColors();
+
+// A file in the current theme's icon set, as a resource path (":/astryx_dark/icons/<file>").
+// Themes without their own set use Lichii Dark's.
+QString ThemeIconPath(const QString& file);
+
 struct ContextualShortcut {
     std::string keyseq;
     std::string controller_keyseq;
@@ -62,11 +79,13 @@ enum class Theme {
     MidnightBlue,
     MidnightBlueColorful,
     LichiiDark,
+    AstryxLight,
+    AstryxDark,
 };
 
 static constexpr Theme default_theme{Theme::LichiiDark};
 
-using Themes = std::array<std::pair<const char*, const char*>, 7>;
+using Themes = std::array<std::pair<const char*, const char*>, 9>;
 extern const Themes themes;
 
 struct GameDir {

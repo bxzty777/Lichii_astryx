@@ -9,6 +9,7 @@
 #include <QScreen>
 #include <QScrollArea>
 #include "lichii/configuration/configuration_shared.h"
+#include "qt_common/config/uisettings.h"
 
 namespace ConfigurationShared {
 
@@ -17,8 +18,8 @@ QIcon PageIcon(const QString& name) {
     if (name.isEmpty()) {
         return icon;
     }
-    const QString normal = QStringLiteral(":/lichii/icons/%1.png").arg(name);
-    const QString active = QStringLiteral(":/lichii/icons/%1_active.png").arg(name);
+    const QString normal = UISettings::ThemeIconPath(QStringLiteral("%1.png").arg(name));
+    const QString active = UISettings::ThemeIconPath(QStringLiteral("%1_active.png").arg(name));
     icon.addFile(normal, {}, QIcon::Normal, QIcon::Off);
     icon.addFile(active, {}, QIcon::Normal, QIcon::On);
     icon.addFile(active, {}, QIcon::Selected, QIcon::Off);

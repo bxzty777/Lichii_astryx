@@ -6459,46 +6459,52 @@ void MainWindow::filterBarSetChecked(bool state) {
 static void AdjustLinkColor() {
     QPalette new_pal(qApp->palette());
 
-    if (UISettings::values.theme == "lichii")
-        new_pal.setColor(QPalette::Link, QColor(0xf4, 0x5a, 0x85));
-    else if (UISettings::IsDarkTheme())
+    if (UISettings::IsLichiiStyleTheme()) {
+        const UISettings::StyleColors& colors = UISettings::CurrentStyleColors();
+        const bool lichii = UISettings::values.theme == "lichii";
+        new_pal.setColor(QPalette::Link,
+                         QColor::fromRgb(lichii ? colors.accent_hover : colors.accent));
+    } else if (UISettings::IsDarkTheme()) {
         new_pal.setColor(QPalette::Link, QColor(0, 190, 255, 255));
-    else
+    } else {
         new_pal.setColor(QPalette::Link, QColor(0, 140, 200, 255));
+    }
 
     if (qApp->palette().color(QPalette::Link) != new_pal.color(QPalette::Link))
         qApp->setPalette(new_pal);
 }
 
-// Lichii Dark styles most widgets through its stylesheet; the palette covers what Qt draws
-// without one: item view text, disabled text, links and the native parts of dialogs.
+// Lichii Dark and the Astryx themes style most widgets through their stylesheets; the palette
+// covers what Qt draws without one: item view text, disabled text, links and the native parts
+// of dialogs.
 static QPalette LichiiPalette() {
+    const UISettings::StyleColors& c = UISettings::CurrentStyleColors();
+    const bool lichii = UISettings::values.theme == "lichii";
+    const auto rgb = [](u32 value) { return QColor::fromRgb(value); };
     QPalette palette;
-    const QColor window(0x17, 0x18, 0x1b);
-    const QColor surface(0x20, 0x21, 0x25);
-    const QColor text(0xec, 0xec, 0xef);
-    const QColor disabled(0x55, 0x57, 0x5d);
-    const QColor accent(0xf0, 0x38, 0x6b);
+    const QColor window = rgb(c.window);
+    const QColor text = rgb(c.text);
+    const QColor disabled = rgb(c.disabled);
     palette.setColor(QPalette::Window, window);
     palette.setColor(QPalette::WindowText, text);
     palette.setColor(QPalette::Base, window);
-    palette.setColor(QPalette::AlternateBase, QColor(0x1b, 0x1c, 0x20));
-    palette.setColor(QPalette::ToolTipBase, QColor(0x23, 0x24, 0x29));
-    palette.setColor(QPalette::ToolTipText, text);
-    palette.setColor(QPalette::PlaceholderText, QColor(0x6f, 0x71, 0x78));
+    palette.setColor(QPalette::AlternateBase, lichii ? QColor(0x1b, 0x1c, 0x20) : rgb(c.surface));
+    palette.setColor(QPalette::ToolTipBase, rgb(c.tooltip));
+    palette.setColor(QPalette::ToolTipText, rgb(c.tooltip_text));
+    palette.setColor(QPalette::PlaceholderText, rgb(c.placeholder));
     palette.setColor(QPalette::Text, text);
-    palette.setColor(QPalette::Button, surface);
+    palette.setColor(QPalette::Button, rgb(c.surface));
     palette.setColor(QPalette::ButtonText, text);
     palette.setColor(QPalette::BrightText, Qt::white);
-    palette.setColor(QPalette::Light, QColor(0x34, 0x36, 0x3c));
-    palette.setColor(QPalette::Midlight, QColor(0x2a, 0x2c, 0x31));
-    palette.setColor(QPalette::Mid, QColor(0x23, 0x24, 0x29));
-    palette.setColor(QPalette::Dark, QColor(0x14, 0x15, 0x18));
+    palette.setColor(QPalette::Light, rgb(c.border));
+    palette.setColor(QPalette::Midlight, rgb(c.hover));
+    palette.setColor(QPalette::Mid, rgb(c.raised));
+    palette.setColor(QPalette::Dark, lichii ? QColor(0x14, 0x15, 0x18) : rgb(c.border_subtle));
     palette.setColor(QPalette::Shadow, Qt::black);
-    palette.setColor(QPalette::Highlight, accent);
-    palette.setColor(QPalette::HighlightedText, Qt::white);
-    palette.setColor(QPalette::Link, QColor(0xf4, 0x5a, 0x85));
-    palette.setColor(QPalette::LinkVisited, QColor(0xd4, 0x2c, 0x5a));
+    palette.setColor(QPalette::Highlight, rgb(c.accent));
+    palette.setColor(QPalette::HighlightedText, rgb(c.on_accent));
+    palette.setColor(QPalette::Link, rgb(lichii ? c.accent_hover : c.accent));
+    palette.setColor(QPalette::LinkVisited, rgb(c.accent_pressed));
     palette.setColor(QPalette::Disabled, QPalette::WindowText, disabled);
     palette.setColor(QPalette::Disabled, QPalette::Text, disabled);
     palette.setColor(QPalette::Disabled, QPalette::ButtonText, disabled);
@@ -6577,7 +6583,7 @@ void MainWindow::UpdateUITheme() {
         current_theme = default_theme;
 
     static bool lichii_palette = false;
-    if (current_theme == QStringLiteral("lichii")) {
+    if (current_theme == QStringLiteral("lichii") || UISettings::IsLichiiStyleTheme()) {
         qApp->setPalette(LichiiPalette());
         lichii_palette = true;
     } else if (lichii_palette) {

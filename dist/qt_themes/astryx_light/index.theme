@@ -1,0 +1,8 @@
+[Icon Theme]
+Name=astryx_light
+Comment=Astryx Light
+Inherits=colorful
+Directories=16x16
+
+[16x16]
+Size=16
