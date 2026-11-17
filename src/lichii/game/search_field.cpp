@@ -117,10 +117,9 @@ GameListSearchField::GameListSearchField(GameList* parent) : QWidget{parent} {
 }
 
 void GameListSearchField::UpdateCloseButtonStyle() {
-    // The Astryx themes style the close button in their style.qss. A widget's own style sheet
-    // would override that, so only the other themes keep the classic red close button.
-    const bool themed = QString::fromStdString(UISettings::values.theme)
-                            .startsWith(QStringLiteral("astryx"));
+    // Lichii Dark and the Astryx themes style the close button in their style.qss. A widget's
+    // own style sheet would override that, so only the other themes keep the classic red button.
+    const bool themed = UISettings::IsLichiiStyleTheme();
     const QString style =
         themed ? QString{}
                : QStringLiteral("QToolButton{ border: none; padding: 0px; color: "

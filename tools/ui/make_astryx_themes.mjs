@@ -202,6 +202,10 @@ const makeQss = (name, folder, r) => {
             if (prop === "border-radius") {
                 value = value.replace(/^(\d+)px$/, (m, px) => `${radii[px] ?? px}px`);
             }
+            // The game cards take their radii as plain numbers (qproperty-cardRadius: 10).
+            if (/^qproperty-\w*Radius$/.test(prop)) {
+                value = value.replace(/^(\d+)$/, (m, px) => `${radii[px] ?? px}`);
+            }
             return `${indent}${prop}${colon}${value};`;
         });
         return `${selector}{${body}}`;
@@ -229,6 +233,12 @@ const makeQss = (name, folder, r) => {
             `$1\n    border: 1px solid ${r.border};`,
         );
     }
+    // A hovered game card lifts with Astryx's hover overlay on its own surface, not the neutral
+    // fill buttons use.
+    themed = themed.replace(
+        /(qproperty-cardHoverBackground: )[^;]+;/,
+        `$1${over(astryxOf(r).overlayHover, r.surface)};`,
+    );
     // The renderer chip is an accent chip.
     themed = themed.replace(/(QPushButton#RendererStatusBarButton \{[^}]*color: )[^;]+;/, `$1${r.textAccent};`);
 
