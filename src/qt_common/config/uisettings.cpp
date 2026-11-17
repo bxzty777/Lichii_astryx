@@ -76,13 +76,71 @@ const Themes themes{{
     {"Midnight Blue", "qdarkstyle_midnight_blue"},
     {"Midnight Blue Colorful", "colorful_midnight_blue"},
     {"Lichii Dark", "lichii"},
+    {"Astryx Light", "astryx_light"},
+    {"Astryx Dark", "astryx_dark"},
 }};
 
 bool IsDarkTheme() {
     const auto& theme = UISettings::values.theme;
     return theme == std::string("qdarkstyle") || theme == std::string("qdarkstyle_midnight_blue") ||
            theme == std::string("colorful_dark") ||
-           theme == std::string("colorful_midnight_blue") || theme == std::string("lichii");
+           theme == std::string("colorful_midnight_blue") || theme == std::string("lichii") ||
+           theme == std::string("astryx_dark");
+}
+
+bool IsLichiiStyleTheme() {
+    const auto& theme = UISettings::values.theme;
+    return theme == std::string("lichii") || theme == std::string("astryx_light") ||
+           theme == std::string("astryx_dark");
+}
+
+// Keep in step with the token lists at the top of each theme's style.qss.
+const StyleColors& CurrentStyleColors() {
+    static constexpr StyleColors lichii_dark{
+        .window = 0x17181b, .surface = 0x202125, .raised = 0x232429, .hover = 0x2a2c31,
+        .border = 0x34363c, .border_subtle = 0x2a2b30,
+        .text = 0xececef, .strong = 0xffffff, .secondary = 0xc4c5ca, .placeholder = 0x6f7178,
+        .disabled = 0x55575d,
+        .accent = 0xf0386b, .accent_hover = 0xf45a85, .accent_pressed = 0xd42c5a,
+        .selection = 0x3a1d28, .on_accent = 0xffffff,
+        .tooltip = 0x232429, .tooltip_text = 0xececef,
+    };
+    // Meta's Astryx default theme tokens (github.com/facebook/astryx), as mapped by
+    // tools/ui/make_astryx_themes.mjs.
+    static constexpr StyleColors astryx_light{
+        .window = 0xf1f4f7, .surface = 0xffffff, .raised = 0xd9e1e7, .hover = 0xcfd9e0,
+        .border = 0xccd3db, .border_subtle = 0xdae1e8,
+        .text = 0x0a1317, .strong = 0x0a1317, .secondary = 0x4e606f, .placeholder = 0x4e606f,
+        .disabled = 0xa4b0bc,
+        .accent = 0x0064e0, .accent_hover = 0x005ac9, .accent_pressed = 0x0050b3,
+        .selection = 0xc1ddf8, .on_accent = 0xffffff,
+        .tooltip = 0x0a1317, .tooltip_text = 0xffffff,
+    };
+    static constexpr StyleColors astryx_dark{
+        .window = 0x111112, .surface = 0x1f1f22, .raised = 0x3a3b3c, .hover = 0x434445,
+        .border = 0x494d53, .border_subtle = 0x272728,
+        .text = 0xdfe2e5, .strong = 0xffffff, .secondary = 0xaaafb5, .placeholder = 0xaaafb5,
+        .disabled = 0x6f747c,
+        .accent = 0x0171e3, .accent_hover = 0x1b7fe6, .accent_pressed = 0x348de9,
+        .selection = 0x0d2d4c, .on_accent = 0xffffff,
+        .tooltip = 0xffffff, .tooltip_text = 0x0a1317,
+    };
+    const auto& theme = UISettings::values.theme;
+    if (theme == std::string("astryx_light")) {
+        return astryx_light;
+    }
+    if (theme == std::string("astryx_dark")) {
+        return astryx_dark;
+    }
+    return lichii_dark;
+}
+
+QString ThemeIconPath(const QString& file) {
+    const auto& theme = UISettings::values.theme;
+    const QString folder = theme == std::string("astryx_light") || theme == std::string("astryx_dark")
+                               ? QString::fromStdString(theme)
+                               : QStringLiteral("lichii");
+    return QStringLiteral(":/%1/icons/%2").arg(folder, file);
 }
 
 Values values = {};

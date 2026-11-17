@@ -27,7 +27,7 @@ QWidget* Item(const QString& icon, const QString& title, const QString& text) {
     badge->setObjectName(QStringLiteral("WhatsNewBadge"));
     badge->setFixedSize(36, 36);
     badge->setAlignment(Qt::AlignCenter);
-    badge->setPixmap(QIcon(QStringLiteral(":/lichii/icons/whatsnew_%1.png").arg(icon)).pixmap(18));
+    badge->setPixmap(QIcon(UISettings::ThemeIconPath(QStringLiteral("whatsnew_%1.png").arg(icon))).pixmap(18));
     layout->addWidget(badge, 0, Qt::AlignTop);
 
     auto* const column = new QVBoxLayout;

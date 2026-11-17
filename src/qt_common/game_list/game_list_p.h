@@ -47,7 +47,7 @@ Q_DECLARE_METATYPE(GameListItemType);
  * @return QPixmap default icon
  */
 static bool IsLichiiTheme() {
-    return UISettings::values.theme == "lichii";
+    return UISettings::IsLichiiStyleTheme();
 }
 
 static QPixmap GetDefaultIcon(u32 size) {
@@ -56,7 +56,7 @@ static QPixmap GetDefaultIcon(u32 size) {
         icon.fill(Qt::transparent);
         return icon;
     }
-    // Lichii Dark draws a game without art as a tile with a controller glyph.
+    // The Lichii-style themes draw a game without art as a tile with a controller glyph.
     const int side = static_cast<int>(size);
     QImage icon(side, side, QImage::Format_ARGB32_Premultiplied);
     icon.fill(Qt::transparent);
@@ -64,11 +64,11 @@ static QPixmap GetDefaultIcon(u32 size) {
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(0x23, 0x24, 0x2a));
+    painter.setBrush(QColor::fromRgb(UISettings::CurrentStyleColors().raised));
     painter.drawRoundedRect(QRectF(0, 0, side, side), side * 0.18, side * 0.18);
     const int glyph = side * 3 / 8;
     painter.drawImage(QRect((side - glyph) / 2, (side - glyph) / 2, glyph, glyph),
-                      QImage(QStringLiteral(":/lichii/icons/menu_gamepad@2x.png")));
+                      QImage(UISettings::ThemeIconPath(QStringLiteral("menu_gamepad@2x.png"))));
     painter.end();
     return QPixmap::fromImage(icon);
 }
@@ -99,8 +99,8 @@ static QPixmap ThemeIcon(const char* name) {
                                   : icon == "list-add" ? "plus"
                                   : icon == "star"     ? "star"
                                                        : "folder";
-        QPixmap pixmap(
-            QStringLiteral(":/lichii/icons/menu_%1@2x.png").arg(QLatin1String(lichii_name)));
+        QPixmap pixmap(UISettings::ThemeIconPath(
+            QStringLiteral("menu_%1@2x.png").arg(QLatin1String(lichii_name))));
         pixmap.setDevicePixelRatio(2.0);
         return pixmap;
     }

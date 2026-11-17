@@ -62,14 +62,15 @@ public:
         const QFontMetrics title_metrics = painter->fontMetrics();
         const QString title =
             title_metrics.elidedText(lines.value(0), Qt::ElideRight, rect.width());
-        painter->setPen(selected ? QColor(Qt::white) : QColor(0xec, 0xec, 0xef));
+        const UISettings::StyleColors& colors = UISettings::CurrentStyleColors();
+        painter->setPen(QColor::fromRgb(selected ? colors.strong : colors.text));
 
         if (type != GameListItemType::Game) {
             painter->drawText(rect, Qt::AlignVCenter | Qt::AlignLeft, title);
             const int games = index.model()->rowCount(index);
             const int x = rect.left() + title_metrics.horizontalAdvance(title) + 10;
             painter->setFont(item.font);
-            painter->setPen(QColor(0x6f, 0x71, 0x78));
+            painter->setPen(QColor::fromRgb(colors.placeholder));
             painter->drawText(QRect(x, rect.top(), std::max(0, rect.right() - x), rect.height()),
                               Qt::AlignVCenter | Qt::AlignLeft,
                               games == 1
@@ -101,13 +102,14 @@ public:
             const int star_y = title_rect.center().y() - 7;
             if (star_x + 14 <= rect.right()) {
                 painter->drawPixmap(QRect(star_x, star_y, 14, 14),
-                                    QPixmap(QStringLiteral(":/lichii/icons/star_accent@2x.png")));
+                                    QPixmap(UISettings::ThemeIconPath(
+                                        QStringLiteral("star_accent@2x.png"))));
             }
         }
 
         if (two_lines) {
             painter->setFont(id_font);
-            painter->setPen(selected ? QColor(0xc4, 0xc5, 0xca) : QColor(0x6f, 0x71, 0x78));
+            painter->setPen(QColor::fromRgb(selected ? colors.secondary : colors.placeholder));
             painter->drawText(
                 QRect(rect.left(), middle + 2, rect.width(), rect.bottom() - middle - 2),
                 flags | Qt::AlignTop,
