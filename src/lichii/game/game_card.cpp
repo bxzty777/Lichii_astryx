@@ -7,6 +7,7 @@
 #include <QTextLayout>
 #include <QTextOption>
 #include "game_card.h"
+#include "lichii/game/card_view.h"
 #include "qt_common/config/uisettings.h"
 
 GameCard::GameCard(QObject* parent) : QStyledItemDelegate{parent} {
@@ -21,27 +22,28 @@ void GameCard::paint(QPainter* painter, const QStyleOptionViewItem& option,
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
 
-    constexpr int cardCornerRadius = 10;
-
     const QRect cardRect = getCardRect(option, index);
 
-    QPalette palette = option.palette;
-    QColor backgroundColor = palette.window().color();
-    QColor borderColor = palette.dark().color();
-    QColor textColor = palette.text().color();
+    const bool selected = option.state & QStyle::State_Selected;
+    const bool hovered = option.state & QStyle::State_MouseOver;
 
-    // highlight on select or hover
-    if (option.state & QStyle::State_Selected) {
-        backgroundColor = palette.highlight().color();
-        borderColor = palette.highlight().color().lighter(150);
-        textColor = palette.highlightedText().color();
-    } else if (option.state & QStyle::State_MouseOver) {
-        backgroundColor = backgroundColor.lighter(120);
+    // The view carries the card look (set by the theme's style.qss); without one, use the
+    // same defaults the view would fall back to.
+    const GameCardView::CardStyle style = GameCardView::ResolveCardStyle(
+        qobject_cast<const GameCardView*>(option.widget), option.palette, selected, hovered);
+
+    painter->setBrush(style.background);
+    if (style.border_width > 0) {
+        // Keep the stroke inside the card so a thicker selection ring doesn't grow the card.
+        const qreal inset = style.border_width / 2.0;
+        painter->setPen(QPen(style.border, style.border_width));
+        painter->drawRoundedRect(QRectF(cardRect).adjusted(inset, inset, -inset, -inset),
+                                 std::max(0.0, style.radius - inset),
+                                 std::max(0.0, style.radius - inset));
+    } else {
+        painter->setPen(Qt::NoPen);
+        painter->drawRoundedRect(cardRect, style.radius, style.radius);
     }
-
-    painter->setBrush(backgroundColor);
-    painter->setPen(QPen(borderColor, 1));
-    painter->drawRoundedRect(cardRect, cardCornerRadius, cardCornerRadius);
 
     const u32 icon_size = UISettings::values.game_cover_size.GetValue();
     QPixmap icon_pixmap = index.data(Qt::DecorationRole).value<QPixmap>();
@@ -58,7 +60,7 @@ void GameCard::paint(QPainter* painter, const QStyleOptionViewItem& option,
 
         painter->save();
         QPainterPath clip_path;
-        clip_path.addRoundedRect(iconRect, cardCornerRadius, cardCornerRadius);
+        clip_path.addRoundedRect(iconRect, style.cover_radius, style.cover_radius);
         painter->setClipPath(clip_path);
         painter->drawPixmap(iconRect, icon_pixmap);
         painter->restore();
@@ -77,10 +79,13 @@ void GameCard::paint(QPainter* painter, const QStyleOptionViewItem& option,
 
         QString title = index.data(Qt::DisplayRole).toString().split(QLatin1Char('\n')).first();
 
-        painter->setPen(textColor);
+        painter->setPen(style.title);
         QFont font = option.font;
-        font.setBold(true);
-        font.setPixelSize(std::max(11.0, std::sqrt(static_cast<double>(icon_size))));
+        font.setWeight(static_cast<QFont::Weight>(style.title_weight));
+        font.setPixelSize(style.title_pixel_size > 0
+                              ? style.title_pixel_size
+                              : static_cast<int>(
+                                    std::max(11.0, std::sqrt(static_cast<double>(icon_size)))));
         painter->setFont(font);
 
         // Words wider than the box break anywhere; what doesn't fit on the second line is elided.

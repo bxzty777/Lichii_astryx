@@ -10,7 +10,8 @@
 #include "lichii/game/game_card.h"
 #include "lichii/game/game_grid.h"
 
-GameGrid::GameGrid(QWidget* parent) : QListView{parent} {
+GameGrid::GameGrid(QWidget* parent) : GameCardView{parent} {
+    setObjectName(QStringLiteral("GameGrid"));
     m_gameCard = new GameCard(this);
     setItemDelegate(m_gameCard);
 

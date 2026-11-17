@@ -47,6 +47,7 @@
 #include "set_play_time_dialog.h"
 #include "util/util.h"
 #include "lichii/game/game_list.h"
+#include "lichii/game/card_view.h"
 #include "lichii/nup_dialogs.h"
 #include "lichii/recommended_settings_dialog.h"
 #include "lichii/shader_warm_dialog.h"
@@ -6617,6 +6618,10 @@ void MainWindow::UpdateUITheme() {
             current_theme = default_theme;
         }
     }
+
+    // Card colors and radii come from the theme as qproperties, which a new style sheet only
+    // adds to; start from the palette look so a theme without them doesn't inherit stale ones.
+    GameCardView::ResetAllThemedProperties();
 
     QString theme_uri{QStringLiteral(":%1/style.qss").arg(current_theme)};
     QFile f(theme_uri);

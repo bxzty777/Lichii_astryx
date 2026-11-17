@@ -27,6 +27,7 @@ public:
 private:
     void changeEvent(QEvent*) override;
     void RetranslateUI();
+    void UpdateCloseButtonStyle();
 
     class KeyReleaseEater : public QObject {
     public:
