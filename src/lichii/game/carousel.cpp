@@ -7,7 +7,8 @@
 #include "lichii/game/game_card.h"
 #include "lichii/game/carousel.h"
 
-GameCarousel::GameCarousel(QWidget* parent) : QListView{parent} {
+GameCarousel::GameCarousel(QWidget* parent) : GameCardView{parent} {
+    setObjectName(QStringLiteral("GameCarousel"));
     m_gameCard = new GameCard(this);
     setItemDelegate(m_gameCard);
 

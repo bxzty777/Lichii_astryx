@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <QListView>
+#include "lichii/game/card_view.h"
 #include <QString>
 
 class GameCard;
 class GameListModel;
 
-class GameGrid : public QListView {
+class GameGrid : public GameCardView {
     Q_OBJECT
 
 public:

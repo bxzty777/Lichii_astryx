@@ -715,6 +715,60 @@ QAbstractItemView::item:selected:!active {
     color: #FFFFFF;
 }
 
+/* Game library: cover grid, carousel and filter bar ----------------------- */
+
+/* The cards are painted in code; these qproperties give them the theme's look. */
+GameCardView {
+    background-color: #111112;
+    qproperty-cardRadius: 12;
+    qproperty-coverRadius: 8;
+    qproperty-cardBorderWidth: 1;
+    qproperty-cardSelectedBorderWidth: 2;
+    qproperty-cardTitlePixelSize: 13;
+    qproperty-cardTitleWeight: 600;
+    qproperty-cardBackground: #1F1F22;
+    qproperty-cardBorder: #272728;
+    qproperty-cardHoverBackground: #2a2a2c;
+    qproperty-cardHoverBorder: #494D53;
+    qproperty-cardSelectedBackground: #0d2d4c;
+    qproperty-cardSelectedBorder: #0171E3;
+    qproperty-cardTitleColor: #DFE2E5;
+    qproperty-cardSelectedTitleColor: #DFE2E5;
+}
+
+QWidget#GameListSearchField {
+    background-color: #1F1F22;
+    border-top: 1px solid #272728;
+}
+
+QLabel#GameListSearchLabel,
+QLabel#GameListSearchResult {
+    color: #AAAFB5;
+}
+
+QLineEdit#GameListSearchEdit {
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 8px;
+}
+
+QToolButton#GameListSearchClose {
+    color: #AAAFB5;
+    font-weight: 600;
+    min-width: 28px;
+    min-height: 28px;
+    border-radius: 8px;
+}
+
+QToolButton#GameListSearchClose:hover {
+    color: #DFE2E5;
+    background-color: #434445;
+}
+
+QToolButton#GameListSearchClose:pressed {
+    background-color: #4d4e4f;
+}
+
 QTreeView::branch {
     background: transparent;
 }
