@@ -18,9 +18,9 @@ Common::Net::Release MakeRelease(std::string tag, std::string filename) {
         {"prerelease", true},
         {"assets",
          {{{"browser_download_url",
-            "https://github.com/zortos293/Lichii/releases/download/" + tag + "/" + filename}}}},
+            "https://github.com/bxzty777/Lichii_astryx/releases/download/" + tag + "/" + filename}}}},
     };
-    return Common::Net::Release::FromJson(json, "https://api.github.com", "zortos293/Lichii")
+    return Common::Net::Release::FromJson(json, "https://api.github.com", "bxzty777/Lichii_astryx")
         .value();
 }
 
@@ -48,7 +48,7 @@ TEST_CASE("Lichii ignores dev builds and malformed release tags", "[updater]") {
     CHECK_FALSE(UpdateChecker::SelectUpdate(releases, tag, "windows-x86_64"));
     auto invalid = releases;
     invalid[0].tag = tag;
-    invalid[0].assets = {"https://github.com/zortos293/Lichii/releases/download/" + tag +
+    invalid[0].assets = {"https://github.com/bxzty777/Lichii_astryx/releases/download/" + tag +
                          "/lichii-windows-x86_64.zip"};
     CHECK_FALSE(UpdateChecker::SelectUpdate(invalid, "build-70", "windows-x86_64"));
 }
@@ -85,7 +85,7 @@ TEST_CASE("Lichii selects only the matching platform and PGO variant", "[updater
           "macos-arm64.zip", "linux-x86_64.AppImage", "linux-x86_64-pgo.AppImage",
           "linux-aarch64.AppImage", "linux-aarch64-pgo.AppImage"}) {
         release.assets.push_back(
-            "https://github.com/zortos293/Lichii/releases/download/build-71/lichii-" +
+            "https://github.com/bxzty777/Lichii_astryx/releases/download/build-71/lichii-" +
             std::string{name});
     }
     const auto selected = release.GetPlatformAssets(platform);
@@ -94,7 +94,7 @@ TEST_CASE("Lichii selects only the matching platform and PGO variant", "[updater
           "lichii-" + platform + (platform.starts_with("linux-") ? ".AppImage" : ".zip"));
     CHECK(selected[0].url == "https://github.com");
     CHECK(selected[0].path ==
-          "/zortos293/Lichii/releases/download/build-71/" + selected[0].filename);
+          "/bxzty777/Lichii_astryx/releases/download/build-71/" + selected[0].filename);
     CHECK_FALSE(release.GetPlatformAssets("android-arm64").size());
     CHECK_FALSE(release.GetPlatformAssets("").size());
 }
@@ -127,7 +127,7 @@ TEST_CASE("PGO builds fall back to the standard asset, standard builds never get
     CHECK(pgo[0].filename == "lichii-windows-x86_64.zip");
 
     release.assets.push_back(
-        "https://github.com/zortos293/Lichii/releases/download/build-71/lichii-windows-x86_64-pgo.zip");
+        "https://github.com/bxzty777/Lichii_astryx/releases/download/build-71/lichii-windows-x86_64-pgo.zip");
     const auto preferred = release.GetPlatformAssets("windows-x86_64-pgo");
     REQUIRE(preferred.size() == 1);
     CHECK(preferred[0].name == "PGO");
@@ -144,7 +144,7 @@ TEST_CASE("PGO builds fall back to the standard asset, standard builds never get
 TEST_CASE("Linux installs only get the package they were installed from", "[updater]") {
     auto release = MakeRelease("build-71", "lichii-linux-x86_64.AppImage");
     release.assets.push_back(
-        "https://github.com/zortos293/Lichii/releases/download/build-71/lichii-linux-x86_64.tar.gz");
+        "https://github.com/bxzty777/Lichii_astryx/releases/download/build-71/lichii-linux-x86_64.tar.gz");
     CHECK(release.GetPlatformAssets("linux-x86_64", Common::Net::LinuxPackage::AppImage)[0]
               .filename == "lichii-linux-x86_64.AppImage");
     CHECK(release.GetPlatformAssets("linux-x86_64", Common::Net::LinuxPackage::Archive)[0]
@@ -161,22 +161,22 @@ TEST_CASE("Asset digest and size come from the release JSON", "[updater]") {
         {"tag_name", "build-71"},
         {"assets",
          {{{"browser_download_url",
-            "https://github.com/zortos293/Lichii/releases/download/build-71/"
+            "https://github.com/bxzty777/Lichii_astryx/releases/download/build-71/"
             "lichii-windows-x86_64.zip"},
            {"size", u64{1234}},
            {"digest", "sha256:" + sha}},
           {{"browser_download_url",
-            "https://github.com/zortos293/Lichii/releases/download/build-71/"
+            "https://github.com/bxzty777/Lichii_astryx/releases/download/build-71/"
             "lichii-linux-x86_64.AppImage"},
            {"size", u64{5}},
            {"digest", "sha256:zz"}},
           {{"browser_download_url",
-            "https://github.com/zortos293/Lichii/releases/download/build-71/"
+            "https://github.com/bxzty777/Lichii_astryx/releases/download/build-71/"
             "lichii-linux-x86_64.tar.gz"},
            {"digest", "md5:abc"}}}},
     };
     const auto release =
-        Common::Net::Release::FromJson(json, "https://api.github.com", "zortos293/Lichii").value();
+        Common::Net::Release::FromJson(json, "https://api.github.com", "bxzty777/Lichii_astryx").value();
     const auto windows = release.GetPlatformAssets("windows-x86_64");
     REQUIRE(windows.size() == 1);
     CHECK(windows[0].sha256 == std::string(64, 'a'));
@@ -204,10 +204,10 @@ TEST_CASE("Failed release requests are classified by status", "[updater]") {
 TEST_CASE("Lichii does not select Eden or lookalike download URLs", "[updater]") {
     const std::string url = GENERATE(
         "https://github.com/eden-emu/eden/releases/download/build-71/lichii-windows-x86_64.zip",
-        "https://github.com/zortos293/Lichii/releases/download/build-70/lichii-windows-x86_64.zip",
-        "https://github.com/zortos293/Lichii/releases/download/build-71/"
+        "https://github.com/bxzty777/Lichii_astryx/releases/download/build-70/lichii-windows-x86_64.zip",
+        "https://github.com/bxzty777/Lichii_astryx/releases/download/build-71/"
         "not-lichii-windows-x86_64.zip",
-        "https://github.com.example.com/zortos293/Lichii/releases/download/build-71/"
+        "https://github.com.example.com/bxzty777/Lichii_astryx/releases/download/build-71/"
         "lichii-windows-x86_64.zip");
     auto release = MakeRelease("build-71", "lichii-windows-x86_64.zip");
     release.assets = {url};
@@ -219,18 +219,18 @@ TEST_CASE("GitHub failures and invalid JSON produce no releases", "[updater]") {
         GENERATE("", "not JSON", R"({"message":"API rate limit exceeded"})", "null", "[]",
                  R"([{"tag_name":42}])", R"([{"tag_name":"build-71","assets":null}])",
                  R"([{"tag_name":"build-71","draft":true}])");
-    CHECK(Common::Net::Release::ListFromJson(json, "https://api.github.com", "zortos293/Lichii")
+    CHECK(Common::Net::Release::ListFromJson(json, "https://api.github.com", "bxzty777/Lichii_astryx")
               .empty());
 }
 
 TEST_CASE("GitHub optional fields can be null or missing", "[updater]") {
     const std::string_view json = R"([{"tag_name":"build-71","name":null,"body":null}])";
     const auto releases =
-        Common::Net::Release::ListFromJson(json, "https://api.github.com", "zortos293/Lichii");
+        Common::Net::Release::ListFromJson(json, "https://api.github.com", "bxzty777/Lichii_astryx");
     REQUIRE(releases.size() == 1);
     CHECK(releases[0].title == "build-71");
     CHECK(releases[0].assets.empty());
-    CHECK(releases[0].html_url == "https://github.com/zortos293/Lichii/releases/tag/build-71");
+    CHECK(releases[0].html_url == "https://github.com/bxzty777/Lichii_astryx/releases/tag/build-71");
 }
 
 TEST_CASE("Release requests handle HTTP failures without throwing", "[updater]") {
